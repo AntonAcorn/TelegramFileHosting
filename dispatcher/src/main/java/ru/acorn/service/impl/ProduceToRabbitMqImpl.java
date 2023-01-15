@@ -18,6 +18,6 @@ public class ProduceToRabbitMqImpl implements ProduceToRabbitMq {
     @Override
     public void produce(String rabbitQueue, Update update) {
         log.debug(update.getMessage().getText());
-//        rabbitTemplate.convertAndSend(rabbitQueue, update);
+        rabbitTemplate.convertAndSend(rabbitQueue, update);
     }
 }
