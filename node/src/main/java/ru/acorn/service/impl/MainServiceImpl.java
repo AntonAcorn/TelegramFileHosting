@@ -3,41 +3,115 @@ package ru.acorn.service.impl;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import ru.acorn.entity.AppUser;
+import ru.acorn.repository.AppUserRepository;
 import ru.acorn.service.AppUserService;
 import ru.acorn.service.MainService;
-import ru.acorn.service.ProduceFromNode;
 import ru.acorn.service.RawDataService;
 import ru.acorn.utils.NodeMessageUtils;
+
+import static ru.acorn.entity.enums.UserState.BASIC_STATE;
+import static ru.acorn.entity.enums.UserState.WAITING_FOR_REGISTRATION;
+import static ru.acorn.service.command.ServiceCommand.*;
 
 @Service
 @Log4j
 public class MainServiceImpl implements MainService {
     private final RawDataService rawDataService;
     private final NodeMessageUtils nodeMessageUtils;
-    private final ProduceFromNode produceFromNode;
-    private  final AppUserService appUserService;
+    private final AppUserService appUserService;
+    private final AppUserRepository appUserRepository;
 
     public MainServiceImpl(RawDataService rawDataService,
                            NodeMessageUtils nodeMessageUtils,
-                           ProduceFromNode produceFromNode,
-                           AppUserService appUserService) {
+                           AppUserService appUserService,
+                           AppUserRepository appUserRepository) {
         this.rawDataService = rawDataService;
         this.nodeMessageUtils = nodeMessageUtils;
-        this.produceFromNode = produceFromNode;
         this.appUserService = appUserService;
+        this.appUserRepository = appUserRepository;
     }
 
     @Override
     public void processTextMessage(Update update) {
         rawDataService.save(update);
-        var AppUser = appUserService.findOrSaveAppUser(update);
+        var appUser = appUserService.findOrSaveAppUser(update);
+        var commandFromUser = update.getMessage().getText();
+        var response = "";
+
+        if (CANCEL.equalCommand(commandFromUser)) {
+            response = cancelProcess(appUser);
+        } else if (BASIC_STATE.equals(appUser.getUserState())) {
+            response = commandProcess(appUser, commandFromUser);
+        } else if (WAITING_FOR_REGISTRATION.equals(appUser.getUserState())) {
+            //TODO
+        } else {
+            response = "Unknown error, try to use /cancel";
+        }
+
+        nodeMessageUtils.sendAnswer(update, response);
+    }
+
+    @Override
+    public void processDocMessage(Update update) {
+        rawDataService.save(update);
+        var appUser = appUserService.findOrSaveAppUser(update);
+
+        if(isNotAllowedToDownload(appUser, update)){
+            return;
+        }
+
+        var response = "The document has been successfully uploaded, here is the link for downloading it:\n" +
+                "http://get-doc";
+        nodeMessageUtils.sendAnswer(update, response);
+    }
 
 
+    @Override
+    public void processPhotoMessage(Update update) {
+        rawDataService.save(update);
+        var appUser = appUserService.findOrSaveAppUser(update);
 
-        log.debug(update.getMessage().getText());
-        var msg = nodeMessageUtils.generateAnswer(update, "Hello from Node");
-        produceFromNode.sendAnswer(msg);
+        if(isNotAllowedToDownload(appUser, update)){
+            return;
+        }
+
+        var response = "The photo has been successfully uploaded, here is the link for downloading it:\n" +
+                "http://get-photo";
+        nodeMessageUtils.sendAnswer(update, response);
+    }
+
+    private boolean isNotAllowedToDownload(AppUser appUser, Update update) {
+        var state = appUser.getUserState();
+        if(!appUser.isActive()){
+            var error = "Please, register or activate your account for downloading content. Write /help or /cancel";
+            nodeMessageUtils.sendAnswer(update, error);
+            return true;
+        } else if (!appUser.getUserState().equals(BASIC_STATE)) {
+            var error = "Please, cancel the current command by using the command /cancel";
+            nodeMessageUtils.sendAnswer(update, error);
+        }
+        return false;
+    }
+
+    private String commandProcess(AppUser appUser, String commandFromUser) {
+        if(REGISTRATION.equalCommand(commandFromUser)){
+            return "This service is unavailable now";
+        }
+         else if (HELP.equalCommand(commandFromUser)) {
+            return "List of available commands: \n" +
+                    "/cancel - canceling the execution of the current command \n" +
+                    "/registration - registration of user";
+        } else if (START.equalCommand(commandFromUser)) {
+            return "Greetings. Kindly upload a picture or document, and I shall provide you with a link for downloading it";
+        }else{
+             return "Unknown command. Use /help or /start";
+        }
+    }
+
+    private String cancelProcess(AppUser appUser) {
+        appUser.setUserState(BASIC_STATE);
+        appUserRepository.save(appUser);
+        return "Command is canceled. Use /start";
     }
 }

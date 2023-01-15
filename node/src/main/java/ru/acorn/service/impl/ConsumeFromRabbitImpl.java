@@ -6,9 +6,6 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.acorn.service.ConsumeFromRabbit;
 import ru.acorn.service.MainService;
-import ru.acorn.service.ProduceFromNode;
-import ru.acorn.utils.NodeMessageUtils;
-
 import static ru.acorn.model.RabbitQueue.*;
 
 @Service
@@ -29,12 +26,12 @@ public class ConsumeFromRabbitImpl implements ConsumeFromRabbit {
     @Override
     @RabbitListener(queues = DOC_MESSAGE_UPDATE)
     public void consumeDocMessage(Update update) {
-
+        mainService.processDocMessage(update);
     }
 
     @Override
     @RabbitListener(queues = PHOTO_MESSAGE_UPDATE)
     public void consumePhotoMessage(Update update) {
-
+        mainService.processPhotoMessage(update);
     }
 }
