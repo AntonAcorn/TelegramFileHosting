@@ -66,7 +66,6 @@ public class MainServiceImpl implements MainService {
         nodeMessageUtils.sendAnswer(update, response);
     }
 
-
     @Override
     public void processPhotoMessage(Update update) {
         rawDataService.save(update);
