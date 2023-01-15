@@ -43,12 +43,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        var msg = update.getMessage();
-        log.debug(msg.getText());
-        var response = new SendMessage();
-        response.setText(msg.getText());
-        response.setChatId(msg.getChatId());
-        sendAnswerMessage(response);
+        updateController.processUpdate(update);
     }
 
     public void sendAnswerMessage(SendMessage message) {
@@ -56,7 +51,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             try {
                 execute(message);
             } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+                log.error(e);
             }
         }
     }

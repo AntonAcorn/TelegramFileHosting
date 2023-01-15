@@ -42,5 +42,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>ru.acorn</groupId>
+            <artifactId>common-rabbitmq</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 </project>
