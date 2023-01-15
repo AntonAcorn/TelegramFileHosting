@@ -4,14 +4,14 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.acorn.service.ProduceToRabbitMq;
+import ru.acorn.service.ProduceToRabbit;
 
 @Service
 @Log4j
-public class ProduceToRabbitMqImpl implements ProduceToRabbitMq {
+public class ProduceToRabbitImpl implements ProduceToRabbit {
     private final RabbitTemplate rabbitTemplate;
 
-    public ProduceToRabbitMqImpl(RabbitTemplate rabbitTemplate) {
+    public ProduceToRabbitImpl(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
@@ -19,6 +19,5 @@ public class ProduceToRabbitMqImpl implements ProduceToRabbitMq {
     public void produce(String rabbitQueue, Update update) {
         log.debug(update.getMessage().getText());
         rabbitTemplate.convertAndSend(rabbitQueue, update);
-
     }
 }

@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.acorn.service.ProduceToRabbitMq;
+import ru.acorn.service.ProduceToRabbit;
 import ru.acorn.utils.MessageUtils;
 
 import static ru.acorn.model.RabbitQueue.*;
@@ -15,12 +15,12 @@ public class UpdateController {
 
     private TelegramBot telegramBot;
     private final MessageUtils messageUtils;
-    private final ProduceToRabbitMq produceToRabbitMq;
+    private final ProduceToRabbit produceToRabbit;
 
 
-    public UpdateController(MessageUtils messageUtils, ProduceToRabbitMq produceToRabbitMq) {
+    public UpdateController(MessageUtils messageUtils, ProduceToRabbit produceToRabbit) {
         this.messageUtils = messageUtils;
-        this.produceToRabbitMq = produceToRabbitMq;
+        this.produceToRabbit = produceToRabbit;
     }
 
 
@@ -70,17 +70,17 @@ public class UpdateController {
     }
 
     private void processPhoto(Update update) {
-        produceToRabbitMq.produce(PHOTO_MESSAGE_UPDATE, update);
+        produceToRabbit.produce(PHOTO_MESSAGE_UPDATE, update);
         setReceivedMessage(update);
     }
 
     private void processDoc(Update update) {
-        produceToRabbitMq.produce(DOC_MESSAGE_UPDATE, update);
+        produceToRabbit.produce(DOC_MESSAGE_UPDATE, update);
         setReceivedMessage(update);
     }
 
     private void processTextMessage(Update update) {
-        produceToRabbitMq.produce(TEXT_MESSAGE_UPDATE, update);
+        produceToRabbit.produce(TEXT_MESSAGE_UPDATE, update);
     }
 
 }

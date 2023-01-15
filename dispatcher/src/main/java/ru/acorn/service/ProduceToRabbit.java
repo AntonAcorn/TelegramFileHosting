@@ -2,6 +2,6 @@ package ru.acorn.service;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public interface ProduceToRabbitMq {
+public interface ProduceToRabbit {
     void produce(String rabbitQueue, Update update);
 }
