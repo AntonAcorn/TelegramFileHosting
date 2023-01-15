@@ -26,6 +26,7 @@ public class MainServiceImpl implements MainService {
     @Override
     public void processTextMessage(Update update) {
         rawDataService.save(update);
+        //empty brunch
 
         log.debug(update.getMessage().getText());
         var msg = nodeMessageUtils.generateAnswer(update, "Hello from Node");
