@@ -19,5 +19,6 @@ public class ProduceToRabbitMqImpl implements ProduceToRabbitMq {
     public void produce(String rabbitQueue, Update update) {
         log.debug(update.getMessage().getText());
         rabbitTemplate.convertAndSend(rabbitQueue, update);
+
     }
 }
