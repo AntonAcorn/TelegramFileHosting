@@ -3,9 +3,12 @@ package ru.acorn.service.impl;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.acorn.entity.AppDocument;
+import ru.acorn.entity.AppPhoto;
 import ru.acorn.entity.AppUser;
 import ru.acorn.repository.AppUserRepository;
 import ru.acorn.service.AppUserService;
+import ru.acorn.service.FileService;
 import ru.acorn.service.MainService;
 import ru.acorn.service.RawDataService;
 import ru.acorn.utils.NodeMessageUtils;
@@ -21,15 +24,18 @@ public class MainServiceImpl implements MainService {
     private final NodeMessageUtils nodeMessageUtils;
     private final AppUserService appUserService;
     private final AppUserRepository appUserRepository;
+    private final FileService fileService;
 
     public MainServiceImpl(RawDataService rawDataService,
                            NodeMessageUtils nodeMessageUtils,
                            AppUserService appUserService,
-                           AppUserRepository appUserRepository) {
+                           AppUserRepository appUserRepository,
+                           FileService fileService) {
         this.rawDataService = rawDataService;
         this.nodeMessageUtils = nodeMessageUtils;
         this.appUserService = appUserService;
         this.appUserRepository = appUserRepository;
+        this.fileService = fileService;
     }
 
     @Override
@@ -57,10 +63,15 @@ public class MainServiceImpl implements MainService {
         rawDataService.save(update);
         var appUser = appUserService.findOrSaveAppUser(update);
 
-        if(isNotAllowedToDownload(appUser, update)){
+        if (isNotAllowedToDownload(appUser, update)) {
             return;
         }
-
+        try {
+            AppDocument appDocument = fileService.processDoc(update.getMessage());
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Downloading unsuccessful");
+            //TODO
+        }
         var response = "The document has been successfully uploaded, here is the link for downloading it:\n" +
                 "http://get-doc";
         nodeMessageUtils.sendAnswer(update, response);
@@ -71,8 +82,15 @@ public class MainServiceImpl implements MainService {
         rawDataService.save(update);
         var appUser = appUserService.findOrSaveAppUser(update);
 
-        if(isNotAllowedToDownload(appUser, update)){
+        if (isNotAllowedToDownload(appUser, update)) {
             return;
+        }
+
+        try {
+            AppPhoto appPhoto = fileService.processPhoto(update.getMessage());
+        }catch (RuntimeException e){
+            throw new RuntimeException("Downloading unsuccessful");
+            //TODO
         }
 
         var response = "The photo has been successfully uploaded, here is the link for downloading it:\n" +
@@ -82,7 +100,7 @@ public class MainServiceImpl implements MainService {
 
     private boolean isNotAllowedToDownload(AppUser appUser, Update update) {
         var state = appUser.getUserState();
-        if(!appUser.isActive()){
+        if (!appUser.isActive()) {
             var error = "Please, register or activate your account for downloading content. Write /help or /cancel";
             nodeMessageUtils.sendAnswer(update, error);
             return true;
@@ -94,17 +112,16 @@ public class MainServiceImpl implements MainService {
     }
 
     private String commandProcess(AppUser appUser, String commandFromUser) {
-        if(REGISTRATION.equalCommand(commandFromUser)){
+        if (REGISTRATION.equalCommand(commandFromUser)) {
             return "This service is unavailable now";
-        }
-         else if (HELP.equalCommand(commandFromUser)) {
+        } else if (HELP.equalCommand(commandFromUser)) {
             return "List of available commands: \n" +
                     "/cancel - canceling the execution of the current command \n" +
                     "/registration - registration of user";
         } else if (START.equalCommand(commandFromUser)) {
             return "Greetings. Kindly upload a picture or document, and I shall provide you with a link for downloading it";
-        }else{
-             return "Unknown command. Use /help or /start";
+        } else {
+            return "Unknown command. Use /help or /start";
         }
     }
 
