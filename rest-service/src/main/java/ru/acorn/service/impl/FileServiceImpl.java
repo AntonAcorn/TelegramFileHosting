@@ -57,7 +57,8 @@ public class FileServiceImpl implements FileService {
             FileUtils.writeByteArrayToFile(temp, binaryContent.getFileArraysOfBytes());
             return new FileSystemResource(temp);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e);
+            return null;
         }
     }
 }
