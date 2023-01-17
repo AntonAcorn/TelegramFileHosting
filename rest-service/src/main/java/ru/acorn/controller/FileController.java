@@ -18,7 +18,7 @@ public class FileController {
     }
 
     @GetMapping("/get-doc")
-    public ResponseEntity<?> getDoc (@RequestParam (name = "id") Long id) {
+    public ResponseEntity<?> getDoc (@RequestParam (name = "id") String id) {
         var doc = fileService.findDocById(id);
         if(doc == null) {
             log.error("Doc is not found");
@@ -39,7 +39,7 @@ public class FileController {
                 .body(fileSystemResource);
     }
     @GetMapping("/get-photo")
-    public ResponseEntity<?> getPhoto (@RequestParam(name = "id") Long id){
+    public ResponseEntity<?> getPhoto (@RequestParam(name = "id") String id){
         var photo = fileService.findPhotoById(id);
         if(photo == null){
             log.error("Doc is not found");

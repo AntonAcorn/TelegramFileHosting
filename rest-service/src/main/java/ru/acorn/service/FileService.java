@@ -6,7 +6,7 @@ import ru.acorn.entity.AppPhoto;
 import ru.acorn.entity.BinaryContent;
 
 public interface FileService {
-    AppDocument findDocById(Long docId);
-    AppPhoto findPhotoById(Long photoId);
+    AppDocument findDocById(String docId);
+    AppPhoto findPhotoById(String photoId);
     FileSystemResource getFileSystemResource (BinaryContent binaryContent);
 }

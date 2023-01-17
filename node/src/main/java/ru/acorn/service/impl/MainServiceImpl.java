@@ -11,6 +11,7 @@ import ru.acorn.service.AppUserService;
 import ru.acorn.service.FileService;
 import ru.acorn.service.MainService;
 import ru.acorn.service.RawDataService;
+import ru.acorn.utils.LinkValue;
 import ru.acorn.utils.NodeMessageUtils;
 
 import static ru.acorn.entity.enums.UserState.BASIC_STATE;
@@ -68,13 +69,14 @@ public class MainServiceImpl implements MainService {
         }
         try {
             AppDocument appDocument = fileService.processDoc(update.getMessage());
+            var link = fileService.generateLink(appDocument.getId(), LinkValue.DOC_VALUE);
+            var response = "The document has been successfully uploaded, here is the link for downloading it:\n" + link;
+            nodeMessageUtils.sendAnswer(update, response);
         } catch (RuntimeException e) {
             throw new RuntimeException("Downloading unsuccessful");
             //TODO
         }
-        var response = "The document has been successfully uploaded, here is the link for downloading it:\n" +
-                "http://get-doc";
-        nodeMessageUtils.sendAnswer(update, response);
+
     }
 
     @Override
@@ -88,14 +90,15 @@ public class MainServiceImpl implements MainService {
 
         try {
             AppPhoto appPhoto = fileService.processPhoto(update.getMessage());
+            var link = fileService.generateLink(appPhoto.getId(), LinkValue.PHOTO_VALUE);
+            var response = "The photo has been successfully uploaded, here is the link for downloading it:\n " + link;
+            nodeMessageUtils.sendAnswer(update, response);
         }catch (RuntimeException e){
             throw new RuntimeException("Downloading unsuccessful");
             //TODO
         }
 
-        var response = "The photo has been successfully uploaded, here is the link for downloading it:\n" +
-                "http://get-photo";
-        nodeMessageUtils.sendAnswer(update, response);
+
     }
 
     private boolean isNotAllowedToDownload(AppUser appUser, Update update) {

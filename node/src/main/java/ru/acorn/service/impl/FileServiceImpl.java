@@ -16,6 +16,8 @@ import ru.acorn.repository.AppDocumentRepository;
 import ru.acorn.repository.AppPhotoRepository;
 import ru.acorn.repository.BinaryContentRepository;
 import ru.acorn.service.FileService;
+import ru.acorn.utils.CryptoTool;
+import ru.acorn.utils.LinkValue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,17 +32,22 @@ public class FileServiceImpl implements FileService {
     private String fileInfoUri;
     @Value("${service.file_storage.uri}")
     private String fileStorageUri;
+    @Value("${rest.service.address}")
+    private String restServiceAddress;
 
     private final BinaryContentRepository binaryContentRepository;
     private final AppDocumentRepository appDocumentRepository;
     private final AppPhotoRepository appPhotoRepository;
+    private final CryptoTool cryptoTool;
 
     public FileServiceImpl(BinaryContentRepository binaryContentRepository,
                            AppDocumentRepository appDocumentRepository,
-                           AppPhotoRepository appPhotoRepository) {
+                           AppPhotoRepository appPhotoRepository,
+                           CryptoTool cryptoTool) {
         this.binaryContentRepository = binaryContentRepository;
         this.appDocumentRepository = appDocumentRepository;
         this.appPhotoRepository = appPhotoRepository;
+        this.cryptoTool = cryptoTool;
     }
 
     @Override
@@ -137,5 +144,11 @@ public class FileServiceImpl implements FileService {
                 token,
                 telegramFileId
                 );
+    }
+
+    @Override
+    public String generateLink(Long id, LinkValue linkValue) {
+        var hash = cryptoTool.hashFromId(id);
+        return restServiceAddress + linkValue + "?id=" + hash;
     }
 }

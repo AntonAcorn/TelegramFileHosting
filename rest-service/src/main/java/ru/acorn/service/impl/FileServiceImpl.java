@@ -1,6 +1,5 @@
 package ru.acorn.service.impl;
 
-import com.google.common.io.Files;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.FileSystemResource;
@@ -11,6 +10,7 @@ import ru.acorn.entity.BinaryContent;
 import ru.acorn.repository.AppDocumentRepository;
 import ru.acorn.repository.AppPhotoRepository;
 import ru.acorn.service.FileService;
+import ru.acorn.utils.CryptoTool;
 
 import javax.ws.rs.NotFoundException;
 import java.io.File;
@@ -22,15 +22,21 @@ import java.util.Optional;
 public class FileServiceImpl implements FileService {
     private final AppDocumentRepository appDocumentRepository;
     private final AppPhotoRepository appPhotoRepository;
+    private final CryptoTool cryptoTool;
+
 
     public FileServiceImpl(AppDocumentRepository appDocumentRepository,
-                           AppPhotoRepository appPhotoRepository) {
+                           AppPhotoRepository appPhotoRepository,
+                           CryptoTool cryptoTool)
+    {
         this.appDocumentRepository = appDocumentRepository;
         this.appPhotoRepository = appPhotoRepository;
+        this.cryptoTool = cryptoTool;
     }
 
     @Override
-    public AppDocument findDocById(Long id) {
+    public AppDocument findDocById(String docId) {
+        var id = cryptoTool.idFromHash(docId);
         Optional <AppDocument> appDocumentToFind = appDocumentRepository.findById(id);
         if (appDocumentToFind.isEmpty()){
             log.error("File is not found");
@@ -40,7 +46,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public AppPhoto findPhotoById(Long id) {
+    public AppPhoto findPhotoById(String photoId) {
+        var id = cryptoTool.idFromHash(photoId);
         Optional <AppPhoto> appPhotoToFind = appPhotoRepository.findById(id);
         if (appPhotoToFind.isEmpty()){
             log.error("File is not found");

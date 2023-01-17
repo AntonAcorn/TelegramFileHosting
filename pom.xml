@@ -8,6 +8,7 @@
         <module>common-rabbitmq</module>
         <module>node</module>
         <module>rest-service</module>
+        <module>common-utils</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
