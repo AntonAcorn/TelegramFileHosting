@@ -1,8 +1,8 @@
 package ru.acorn.utils;
 
 public enum LinkValue {
-    DOC_VALUE ("/file/get-doc/"),
-    PHOTO_VALUE("/file/get-photo/");
+    DOC_VALUE ("/file/get-doc"),
+    PHOTO_VALUE("/file/get-photo");
 
     private final String link;
 

@@ -8,8 +8,8 @@ import ru.acorn.utils.CryptoTool;
 
 @Configuration
 public class NodeConfiguration {
-    @Value("${salt}")
-    private String salt;
+    //@Value("${salt}")
+    private String salt = "qwertyui";
 
     @Bean
     CryptoTool getCryptoTool (){

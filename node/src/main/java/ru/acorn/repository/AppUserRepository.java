@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional <AppUser> findAppUserByTelegramUserId(Long telegramUserId);
+    Optional<AppUser> findById(Long id);
+    Optional<AppUser> findAppUserByEmail(String email);
 }

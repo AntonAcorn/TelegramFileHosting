@@ -32,7 +32,7 @@ public class AppUserServiceImpl implements AppUserService {
                     .username(telegramUser.getUserName())
                     .firstname(telegramUser.getFirstName())
                     .lastname(telegramUser.getLastName())
-                    .isActive(true)
+                    .isActive(false)
                     .userState(UserState.BASIC_STATE)
                     .build();
             return appUserRepository.save(transientAppUser);

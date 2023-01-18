@@ -7,10 +7,7 @@ import ru.acorn.entity.AppDocument;
 import ru.acorn.entity.AppPhoto;
 import ru.acorn.entity.AppUser;
 import ru.acorn.repository.AppUserRepository;
-import ru.acorn.service.AppUserService;
-import ru.acorn.service.FileService;
-import ru.acorn.service.MainService;
-import ru.acorn.service.RawDataService;
+import ru.acorn.service.*;
 import ru.acorn.utils.LinkValue;
 import ru.acorn.utils.NodeMessageUtils;
 
@@ -26,17 +23,20 @@ public class MainServiceImpl implements MainService {
     private final AppUserService appUserService;
     private final AppUserRepository appUserRepository;
     private final FileService fileService;
+    private final ActivationUserService activationUserService;
 
     public MainServiceImpl(RawDataService rawDataService,
                            NodeMessageUtils nodeMessageUtils,
                            AppUserService appUserService,
                            AppUserRepository appUserRepository,
-                           FileService fileService) {
+                           FileService fileService,
+                           ActivationUserService activationUserService) {
         this.rawDataService = rawDataService;
         this.nodeMessageUtils = nodeMessageUtils;
         this.appUserService = appUserService;
         this.appUserRepository = appUserRepository;
         this.fileService = fileService;
+        this.activationUserService = activationUserService;
     }
 
     @Override
@@ -51,8 +51,9 @@ public class MainServiceImpl implements MainService {
         } else if (BASIC_STATE.equals(appUser.getUserState())) {
             response = commandProcess(appUser, commandFromUser);
         } else if (WAITING_FOR_REGISTRATION.equals(appUser.getUserState())) {
-            //TODO
+            response = activationUserService.setEmail(appUser, commandFromUser);
         } else {
+            log.error(response);
             response = "Unknown error, try to use /cancel";
         }
 
@@ -116,7 +117,7 @@ public class MainServiceImpl implements MainService {
 
     private String commandProcess(AppUser appUser, String commandFromUser) {
         if (REGISTRATION.equalCommand(commandFromUser)) {
-            return "This service is unavailable now";
+            return activationUserService.registerUser(appUser);
         } else if (HELP.equalCommand(commandFromUser)) {
             return "List of available commands: \n" +
                     "/cancel - canceling the execution of the current command \n" +

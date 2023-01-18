@@ -12,10 +12,8 @@ import ru.acorn.repository.AppPhotoRepository;
 import ru.acorn.service.FileService;
 import ru.acorn.utils.CryptoTool;
 
-import javax.ws.rs.NotFoundException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
 @Service
 @Log4j
@@ -37,23 +35,19 @@ public class FileServiceImpl implements FileService {
     @Override
     public AppDocument findDocById(String docId) {
         var id = cryptoTool.idFromHash(docId);
-        Optional <AppDocument> appDocumentToFind = appDocumentRepository.findById(id);
-        if (appDocumentToFind.isEmpty()){
-            log.error("File is not found");
-            throw new NotFoundException("Document is not found");
+        if (id == null){
+            return null;
         }
-        return appDocumentToFind.get();
+        return appDocumentRepository.findById(id).orElse(null);
     }
 
     @Override
     public AppPhoto findPhotoById(String photoId) {
         var id = cryptoTool.idFromHash(photoId);
-        Optional <AppPhoto> appPhotoToFind = appPhotoRepository.findById(id);
-        if (appPhotoToFind.isEmpty()){
-            log.error("File is not found");
-            throw new NotFoundException("Photo is not found");
+        if (id == null){
+            return null;
         }
-        return appPhotoToFind.get();
+        return appPhotoRepository.findById(id).orElse(null);
     }
 
     @Override
