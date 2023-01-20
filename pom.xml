@@ -9,7 +9,6 @@
         <module>node</module>
         <module>rest-service</module>
         <module>common-utils</module>
-        <module>mail-service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
