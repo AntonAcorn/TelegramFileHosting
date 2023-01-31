@@ -31,9 +31,20 @@ This project is in progress
 * /help
 
 ## static ip
-чтобы получить static ip используй localtunnel (require node.js)
+чтобы получить static ip используй localtunnel (require node.js)  
 Mac OS:
-$ brew install localtunnel
+$ brew install localtunnel  
+
+$ lt --port 8080
+
+Use port on which dispatcher server is set. It will return temporal static
+ip that will be a bot.uri in dispatcher application.properties.  
+It works for 2 hours. Than you should do it again  
+While using $ lt --port 8080 terminal has to be opened
+
+Otherwise you can use 
+brew install --cask ngrok
+
 
 
 
