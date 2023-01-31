@@ -30,6 +30,12 @@ This project is in progress
 * /cancel
 * /help
 
+## static ip
+чтобы получить static ip используй localtunnel (require node.js)
+Mac OS:
+$ brew install localtunnel
+
+
 
 
 

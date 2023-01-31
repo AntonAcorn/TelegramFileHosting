@@ -63,12 +63,12 @@ public class TelegramBot extends TelegramWebhookBot {
     }
 
     @Override
-    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        return null;
+    public String getBotPath() {
+        return "/update";
     }
 
     @Override
-    public String getBotPath() {
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         return null;
     }
 }
