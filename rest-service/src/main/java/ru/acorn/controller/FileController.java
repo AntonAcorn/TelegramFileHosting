@@ -43,23 +43,25 @@ public class FileController {
     }
 
     @GetMapping("/get-photo")
-    public ResponseEntity<?> getPhoto (@RequestParam(name = "id") String id){
+    public void getPhoto (@RequestParam(name = "id") String id, HttpServletResponse response){
         var photo = fileService.findPhotoById(id);
         if(photo == null){
             log.error("Doc is not found");
-            return ResponseEntity.badRequest().body("Doc is not found");
+            return;
         }
+
+        response.setContentType(MediaType.IMAGE_JPEG.toString());
+        response.setHeader("Content-disposition", "attachment;");
+        response.setStatus(HttpServletResponse.SC_OK);
 
         var binaryContent = photo.getBinaryContent();
-        FileSystemResource fileSystemResource = fileService.getFileSystemResource(binaryContent);
-
-        if(fileSystemResource == null){
-            return ResponseEntity.internalServerError().body("Server problem");
+        try{
+            var out = response.getOutputStream();
+            out.write(binaryContent.getFileArraysOfBytes());
+            out.close();
+        } catch (IOException e) {
+            log.error(e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .header("Content-disposition", "attachment;")
-                .body(fileSystemResource);
     }
 }
