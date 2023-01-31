@@ -5,12 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
 
 @Component
 @Log4j
@@ -20,15 +18,15 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String botToken;
 
-    private UpdateController updateController;
+    private UpdateProcessor updateProcessor;
 
-    public TelegramBot(UpdateController updateController) {
-        this.updateController = updateController;
+    public TelegramBot(UpdateProcessor updateProcessor) {
+        this.updateProcessor = updateProcessor;
     }
 
     @PostConstruct
     public void registerUpdateController() {
-        updateController.registerBot(this);
+        updateProcessor.registerBot(this);
     }
 
     @Override
@@ -43,7 +41,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        updateController.processUpdate(update);
+        updateProcessor.processUpdate(update);
     }
 
     public void sendAnswerMessage(SendMessage message) {
