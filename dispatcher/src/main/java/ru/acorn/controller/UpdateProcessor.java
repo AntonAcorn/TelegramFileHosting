@@ -11,14 +11,14 @@ import static ru.acorn.model.RabbitQueue.*;
 
 @Component
 @Log4j
-public class UpdateController {
+public class UpdateProcessor {
 
     private TelegramBot telegramBot;
     private final MessageUtils messageUtils;
     private final ProduceToRabbit produceToRabbit;
 
 
-    public UpdateController(MessageUtils messageUtils, ProduceToRabbit produceToRabbit) {
+    public UpdateProcessor(MessageUtils messageUtils, ProduceToRabbit produceToRabbit) {
         this.messageUtils = messageUtils;
         this.produceToRabbit = produceToRabbit;
     }

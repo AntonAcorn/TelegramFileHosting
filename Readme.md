@@ -30,6 +30,27 @@ This project is in progress
 * /cancel
 * /help
 
+## static ip
+чтобы получить static ip используй localtunnel (require node.js)  
+Mac OS:
+$ brew install localtunnel  
+
+$ lt --port <port of disparcher service>
+
+It will return temporal static
+ip that will be a bot.uri in dispatcher application.properties.  
+It works for 2 hours. Than you should do it again  
+While using $ lt --port 8080 terminal has to be opened
+
+Otherwise you can use 
+brew install --cask ngrok
+Then register on website and get secret token
+use following command with your token:  
+$ ngrok config add-authtoken <token>
+$ ngrok http <port of disparcher service>
+
+
+
 
 
 

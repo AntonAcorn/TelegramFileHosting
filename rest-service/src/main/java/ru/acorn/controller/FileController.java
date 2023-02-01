@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.acorn.service.FileService;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/file")
 @Log4j
@@ -18,44 +21,47 @@ public class FileController {
     }
 
     @GetMapping("/get-doc")
-    public ResponseEntity<?> getDoc (@RequestParam (name = "id") String id) {
+    public void getDoc (@RequestParam (name = "id") String id, HttpServletResponse response) {
         var doc = fileService.findDocById(id);
         if(doc == null) {
             log.error("Doc is not found");
-            return ResponseEntity.badRequest().body("Doc is not found");
+            return;
         }
+        response.setContentType(MediaType.parseMediaType(doc.getMimeType()).toString());
+        response.setHeader("Content-disposition", "attachment; filename=" + doc.getFilename());
+        response.setStatus(HttpServletResponse.SC_OK);
 
         var binaryContent = doc.getBinaryContent();
-        FileSystemResource fileSystemResource = fileService.getFileSystemResource(binaryContent);
-
-        if(!(fileSystemResource.isFile())){
-            log.error("Server problem");
-            return ResponseEntity.internalServerError().build();
+        try{
+            var out = response.getOutputStream();
+            out.write(binaryContent.getFileArraysOfBytes());
+            out.close();
+        } catch (IOException e) {
+            log.error(e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(doc.getMimeType()))
-                .header("Content-disposition", "attachment; filename=" + doc.getFilename())
-                .body(fileSystemResource);
     }
+
     @GetMapping("/get-photo")
-    public ResponseEntity<?> getPhoto (@RequestParam(name = "id") String id){
+    public void getPhoto (@RequestParam(name = "id") String id, HttpServletResponse response){
         var photo = fileService.findPhotoById(id);
         if(photo == null){
             log.error("Doc is not found");
-            return ResponseEntity.badRequest().body("Doc is not found");
+            return;
         }
+
+        response.setContentType(MediaType.IMAGE_JPEG.toString());
+        response.setHeader("Content-disposition", "attachment;");
+        response.setStatus(HttpServletResponse.SC_OK);
 
         var binaryContent = photo.getBinaryContent();
-        FileSystemResource fileSystemResource = fileService.getFileSystemResource(binaryContent);
-
-        if(fileSystemResource == null){
-            return ResponseEntity.internalServerError().body("Server problem");
+        try{
+            var out = response.getOutputStream();
+            out.write(binaryContent.getFileArraysOfBytes());
+            out.close();
+        } catch (IOException e) {
+            log.error(e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .header("Content-disposition", "attachment;")
-                .body(fileSystemResource);
     }
 }
