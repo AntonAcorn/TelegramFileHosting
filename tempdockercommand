@@ -27,12 +27,6 @@ $ rabbitmqctl set_user_tags test administrator
 $ rabbitmqctl set_permissions -p / test ".*" ".*" ".*"
 
 
-
-
-
-
-
-
 БД: test
 Пользователь: test
 Пароль: test
