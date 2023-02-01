@@ -13,7 +13,14 @@ Register users
 Upload document or photo and receive a link to download in return
 
 ## Deployment
-This project is in progress
+To start RabbitMq: $ docker run -d --hostname rabbitmq --name rabbitmq -p 5672:5672 -p 15672:15672 -v rabbitmq_data:/var/lib/rabbitmq --restart=unless-stopped rabbitmq:3.11.0-management
+To start PostgreSql: $ docker run -d --hostname test --name test -p 5432:5432 -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=test -v test_data:/var/lib/postgresql/data --restart=unless-stopped postgres:14.5
+Use data from these commands in your application.properties and add your bot token
+Then use:
+Start all services:
+1) dispatcher
+2) node
+3) rest-service
 
 ### Technology stack
 * Java 11
@@ -31,7 +38,7 @@ This project is in progress
 * /help
 
 ## static ip
-чтобы получить static ip используй localtunnel (require node.js)  
+To get static ip use localtunnel (require node.js)  
 Mac OS:
 $ brew install localtunnel  
 
