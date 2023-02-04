@@ -48,6 +48,7 @@ ip that will be a bot.uri in dispatcher application.properties.
 It works for 2 hours. Than you should do it again  
 While using $ lt --port 8080 terminal has to be opened
 
+
 Otherwise you can use 
 brew install --cask ngrok
 Then register on website and get secret token
